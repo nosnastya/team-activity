@@ -13,9 +13,18 @@ const ThemeToggle = () => {
       className="relative inline-flex items-center justify-center w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
       aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
     >
+       {/* Moon Icon */}
+       <svg
+        className={`absolute w-6 h-6 text-blue-400 transition-all duration-300 ${!isDark ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+      </svg>
+
       {/* Sun Icon */}
       <svg
-        className={`w-6 h-6 text-yellow-500 transition-all duration-300 ${isDark ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+        className={`w-6 h-6 text-yellow-500 transition-all duration-300 ${!isDark ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -26,14 +35,7 @@ const ThemeToggle = () => {
         />
       </svg>
 
-      {/* Moon Icon */}
-      <svg
-        className={`absolute w-6 h-6 text-blue-400 transition-all duration-300 ${isDark ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}
-        fill="currentColor"
-        viewBox="0 0 20 20"
-      >
-        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-      </svg>
+     
     </button>
   );
 };
