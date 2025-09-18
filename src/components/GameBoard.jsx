@@ -31,7 +31,25 @@ const GameBoard = () => {
 
   const handleShareSession = async () => {
     if (pairs.length > 0) {
-      const shareUrl = generateShareableUrl(mysteryCards, pairs[0].scenario);
+      const pair = pairs[0];
+      
+      // Create mystery cards from pair data for URL generation
+      const pairMysteryCards = [
+        {
+          id: 1,
+          isRevealed: true,
+          participant: pair.managerName,
+          role: 'Manager'
+        },
+        {
+          id: 2,
+          isRevealed: true,
+          participant: pair.employeeName,
+          role: 'Employee'
+        }
+      ];
+      
+      const shareUrl = generateShareableUrl(pairMysteryCards, pair.scenario);
       
       try {
         await navigator.clipboard.writeText(shareUrl);
