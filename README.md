@@ -1,5 +1,9 @@
 # Role-Play Game: Manager & Employee Scenarios
 
+
+
+Live At: [https://nosnastya.github.io/team-activity/]
+
 A modern, interactive React application for conducting role-play exercises between managers and employees. Built with React, TailwindCSS, and Zustand for state management.
 
 ## Features
