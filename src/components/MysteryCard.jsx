@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useGameStore from '../store/gameStore.js';
+import useGameStore from '../store/gameStore.ts';
 
 /**
  * MysteryCard component with magical shimmer effects and automatic assignment

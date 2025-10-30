@@ -3,7 +3,19 @@
  * Based on practical management training objectives
  */
 
-export const scenarios = [
+export interface Scenario {
+  id: number;
+  title: string;
+  description: string;
+  objective: string;
+  employeeRole: string;
+  keySkills: string;
+  managerBrief: string;
+  employeeBrief: string;
+  employeePhrases: string[];
+}
+
+export const scenarios: Scenario[] = [
   {
     id: 1,
     title: "Persona Discovery",
@@ -115,7 +127,7 @@ export const scenarios = [
 /**
  * Real team member participants
  */
-export const participants = [
+export const participants: string[] = [
   "Amira Mohiey Eldeen",
   "Haitham Qudaih",
   "Hazem Huzayen",
@@ -129,10 +141,8 @@ export const participants = [
 
 /**
  * Shuffle array using Fisher-Yates algorithm
- * @param {Array} array - Array to shuffle
- * @returns {Array} - Shuffled copy of the array
  */
-export const shuffleArray = (array) => {
+export const shuffleArray = <T>(array: T[]): T[] => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

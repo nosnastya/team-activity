@@ -3,11 +3,27 @@
  * Handles encoding/decoding training session state to/from URL parameters
  */
 
+import type { Scenario } from '../data/scenarios.ts';
+
+export interface MysteryCard {
+  id: number;
+  isRevealed: boolean;
+  participant: string;
+  role: string;
+}
+
+export interface UrlState {
+  hasUrlState: boolean;
+  mysteryCards?: MysteryCard[] | null;
+  scenarioId?: number | null;
+  scenarioTitle?: string | null;
+}
+
 /**
  * Update URL with current training session state
  */
-export const updateUrlWithState = (mysteryCards, scenario) => {
-  const url = new URL(window.location);
+export const updateUrlWithState = (mysteryCards: MysteryCard[], scenario: Scenario): void => {
+  const url = new URL(window.location.href);
   const params = url.searchParams;
   
   // Clear existing params
@@ -27,7 +43,7 @@ export const updateUrlWithState = (mysteryCards, scenario) => {
     
     // Add scenario if available
     if (scenario) {
-      params.set('scenario_id', scenario.id);
+      params.set('scenario_id', scenario.id.toString());
       params.set('scenario_title', encodeURIComponent(scenario.title));
     }
   }
@@ -39,8 +55,8 @@ export const updateUrlWithState = (mysteryCards, scenario) => {
 /**
  * Parse URL parameters to restore training session state
  */
-export const parseUrlState = () => {
-  const url = new URL(window.location);
+export const parseUrlState = (): UrlState => {
+  const url = new URL(window.location.href);
   const params = url.searchParams;
   
   const card1Role = params.get('card1_role');
@@ -84,7 +100,7 @@ export const parseUrlState = () => {
 /**
  * Generate shareable URL for current session
  */
-export const generateShareableUrl = (mysteryCards, scenario) => {
+export const generateShareableUrl = (mysteryCards: MysteryCard[], scenario: Scenario): string => {
   const url = new URL(window.location.origin + window.location.pathname);
   const params = url.searchParams;
   
@@ -95,7 +111,7 @@ export const generateShareableUrl = (mysteryCards, scenario) => {
     params.set('card2_name', encodeURIComponent(mysteryCards[1].participant));
     
     if (scenario) {
-      params.set('scenario_id', scenario.id);
+      params.set('scenario_id', scenario.id.toString());
       params.set('scenario_title', encodeURIComponent(scenario.title));
     }
   }
@@ -106,8 +122,8 @@ export const generateShareableUrl = (mysteryCards, scenario) => {
 /**
  * Clear URL parameters
  */
-export const clearUrlState = () => {
-  const url = new URL(window.location);
+export const clearUrlState = (): void => {
+  const url = new URL(window.location.href);
   const params = url.searchParams;
   
   params.delete('card1_role');

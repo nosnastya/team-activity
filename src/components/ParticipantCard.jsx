@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useGameStore from '../store/gameStore.js';
+import useGameStore from '../store/gameStore.ts';
 
 /**
  * ParticipantCard component with basic styling

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import useGameStore from '../store/gameStore.js';
+import useGameStore from '../store/gameStore.ts';
 import MysteryCard from './MysteryCard.jsx';
 import ScenarioCard from './ScenarioCard.jsx';
-import EmployeePhrasesCard from './EmployeePhrasesCard.jsx';
+import ManagerCard from './ManagerCard.jsx';
+import EmployeeCard from './EmployeeCard.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
-import { generateShareableUrl } from '../utils/urlState.js';
+import { generateShareableUrl } from '../utils/urlState.ts';
 
 /**
  * GameBoard component with basic TailwindCSS styling
@@ -16,6 +17,8 @@ const GameBoard = () => {
     initializeGame,
     resetGame,
     getGameStats,
+    startNextPair,
+    canStartNextPair,
   } = useGameStore();
   
   const [shareMessage, setShareMessage] = useState('');
@@ -27,6 +30,10 @@ const GameBoard = () => {
 
   const handleResetGame = () => {
     resetGame();
+  };
+
+  const handleNextPair = () => {
+    startNextPair();
   };
 
   const handleShareSession = async () => {
@@ -87,25 +94,25 @@ const GameBoard = () => {
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Revealed: <span className="font-bold">{stats.revealedParticipants}/{stats.totalParticipants}</span>
+                Available: <span className="font-bold">{stats.availableParticipants}</span>
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Pairs: <span className="font-bold">{stats.formedPairs}</span>
+                Used: <span className="font-bold">{stats.usedParticipants}</span>
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Scenarios: <span className="font-bold">{stats.revealedScenarios}</span>
+                Scenarios: <span className="font-bold">{stats.availableScenarios}</span>
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Used: <span className="font-bold">{stats.usedScenarios}</span>
+                Pairs: <span className="font-bold">{stats.formedPairs}</span>
               </span>
             </div>
                 <div className="flex gap-2">
@@ -190,7 +197,7 @@ const GameBoard = () => {
         {pairs.length > 0 && (
           <div>
             <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-8 text-center">
-              Paired Scenarios & Employee Guides
+              Manager & Employee Coaching Guides
             </h2>
             <div className="space-y-12">
               {pairs.map((pair) => {
@@ -212,16 +219,48 @@ const GameBoard = () => {
                     
                     {/* After scenario is revealed - side by side cards */}
                     {pair.isScenarioRevealed && (
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-[1600px] mx-auto">
-                        {/* Scenario Card */}
-                        <div className="flex flex-col h-full">
-                          <ScenarioCard pair={pair} />
+                      <div className="space-y-8">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-[1600px] mx-auto">
+                          {/* Manager Card */}
+                          <div className="flex flex-col h-full">
+                            <ManagerCard pair={pair} />
+                          </div>
+                          
+                          {/* Employee Card */}
+                          <div className="flex flex-col h-full">
+                            <EmployeeCard pair={pair} employee={employee} />
+                          </div>
                         </div>
                         
-                        {/* Employee Phrases Card */}
-                        <div className="flex flex-col h-full">
-                          <EmployeePhrasesCard pair={pair} employee={employee} />
-                        </div>
+                        {/* Next Pair Button */}
+                        {canStartNextPair() && (
+                          <div className="flex justify-center mt-12">
+                            <button
+                              onClick={handleNextPair}
+                              className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-purple-400"
+                            >
+                              <span className="flex items-center space-x-3">
+                                <span>🎭</span>
+                                <span>Next Pair</span>
+                                <span>✨</span>
+                              </span>
+                            </button>
+                          </div>
+                        )}
+                        
+                        {/* No More Pairs Available Message */}
+                        {!canStartNextPair() && (
+                          <div className="flex justify-center mt-12">
+                            <div className="bg-amber-100 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-600 rounded-xl px-8 py-4 text-center">
+                              <div className="text-amber-800 dark:text-amber-300 font-bold text-lg mb-2">
+                                🏆 All Scenarios Complete!
+                              </div>
+                              <div className="text-amber-600 dark:text-amber-400 text-sm">
+                                No more participants or scenarios available for new pairs
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
