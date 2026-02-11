@@ -112,8 +112,8 @@ const useGameStore = create<GameStore>((set, get) => ({
     scenarioId: null
   })),
   
-  // Available scenarios (not shuffled)
-  availableScenarios: scenarios,
+  // Available scenarios (initialized from selectedScenarios)
+  availableScenarios: [...scenarios],
   
   // Pairs of participants (Manager + Employee)
   pairs: [],
@@ -159,7 +159,7 @@ const useGameStore = create<GameStore>((set, get) => ({
     ];
     const shuffledRoles = shuffleArray(roles);
 
-    set(() => ({
+    set((state) => ({
       participants: participants.map((name, index) => ({
         id: index + 1,
         name: name,
@@ -177,7 +177,8 @@ const useGameStore = create<GameStore>((set, get) => ({
         { id: 1, isRevealed: false, participant: null, role: null },
         { id: 2, isRevealed: false, participant: null, role: null }
       ],
-      availableScenarios: scenarios
+      // Use selectedScenarios instead of all scenarios
+      availableScenarios: state.selectedScenarios
     }));
     
     // Clear any existing URL state
@@ -263,11 +264,18 @@ const useGameStore = create<GameStore>((set, get) => ({
       !state.usedParticipantNames.has(name)
     );
     
-    // If only 1 participant left, randomly select from already used participants for the 8th person
-    if (availableParticipants.length === 1) {
+    // Check if the other card is already revealed
+    const otherCard = state.mysteryCards.find(card => card.id !== cardId);
+    const isSecondCard = otherCard?.isRevealed;
+    
+    // If we're revealing the second card and no/few participants available, allow reuse
+    if (isSecondCard && (availableParticipants.length === 0 || availableParticipants.length === 1)) {
+      // Get used participants, but exclude the one already revealed in the other card
+      const otherParticipant = otherCard?.participant;
       const usedParticipants = state.selectedParticipants.filter(name => 
-        state.usedParticipantNames.has(name)
+        state.usedParticipantNames.has(name) && name !== otherParticipant
       );
+      
       // Add a random used participant to available list for the second card
       if (usedParticipants.length > 0) {
         const randomUsedParticipant = usedParticipants[Math.floor(Math.random() * usedParticipants.length)];
@@ -285,9 +293,8 @@ const useGameStore = create<GameStore>((set, get) => ({
     // Determine role strategically to ensure one Manager and one Employee
     // First card (id: 1) is always Employee, second card (id: 2) is always Manager
     let assignedRole: Role;
-    const otherCard = state.mysteryCards.find(card => card.id !== cardId);
     
-    if (otherCard?.isRevealed) {
+    if (isSecondCard) {
       // Other card is already revealed, assign opposite role
       assignedRole = otherCard.role === ROLES.MANAGER ? ROLES.EMPLOYEE : ROLES.MANAGER;
     } else {
