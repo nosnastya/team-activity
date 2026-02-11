@@ -54,10 +54,25 @@ export const updateUrlWithState = (mysteryCards: MysteryCard[], scenario: Scenar
 
 /**
  * Parse URL parameters to restore training session state
+ * For hash routing, query params come after the hash: #/game?params
  */
 export const parseUrlState = (): UrlState => {
-  const url = new URL(window.location.href);
-  const params = url.searchParams;
+  // With hash routing, query params are after the hash
+  // URL format: https://example.com/#/game?card1_role=...
+  const hash = window.location.hash; // e.g., "#/game?card1_role=..."
+  const queryIndex = hash.indexOf('?');
+  
+  if (queryIndex === -1) {
+    return {
+      hasUrlState: false,
+      mysteryCards: null,
+      scenarioId: null,
+      scenarioTitle: null
+    };
+  }
+  
+  const queryString = hash.substring(queryIndex + 1);
+  const params = new URLSearchParams(queryString);
   
   const card1Role = params.get('card1_role');
   const card1Name = params.get('card1_name');
@@ -74,18 +89,18 @@ export const parseUrlState = (): UrlState => {
         {
           id: 1,
           isRevealed: true,
-          participant: decodeURIComponent(card1Name),
-          role: decodeURIComponent(card1Role)
+          participant: card1Name,
+          role: card1Role
         },
         {
           id: 2,
           isRevealed: true,
-          participant: decodeURIComponent(card2Name),
-          role: decodeURIComponent(card2Role)
+          participant: card2Name,
+          role: card2Role
         }
       ],
       scenarioId: scenarioId ? parseInt(scenarioId) : null,
-      scenarioTitle: scenarioTitle ? decodeURIComponent(scenarioTitle) : null
+      scenarioTitle: scenarioTitle || null
     };
   }
   
@@ -102,18 +117,19 @@ export const parseUrlState = (): UrlState => {
  * Uses hash routing for GitHub Pages compatibility
  */
 export const generateShareableUrl = (mysteryCards: MysteryCard[], scenario: Scenario): string => {
-  const baseUrl = window.location.origin + window.location.pathname;
+  // Get base URL without hash
+  const baseUrl = `${window.location.origin}${window.location.pathname}`;
   const params = new URLSearchParams();
   
   if (mysteryCards && mysteryCards.length === 2 && mysteryCards.every(card => card.isRevealed)) {
-    params.set('card1_role', encodeURIComponent(mysteryCards[0].role));
-    params.set('card1_name', encodeURIComponent(mysteryCards[0].participant));
-    params.set('card2_role', encodeURIComponent(mysteryCards[1].role));
-    params.set('card2_name', encodeURIComponent(mysteryCards[1].participant));
+    params.set('card1_role', mysteryCards[0].role);
+    params.set('card1_name', mysteryCards[0].participant);
+    params.set('card2_role', mysteryCards[1].role);
+    params.set('card2_name', mysteryCards[1].participant);
     
     if (scenario) {
       params.set('scenario_id', scenario.id.toString());
-      params.set('scenario_title', encodeURIComponent(scenario.title));
+      params.set('scenario_title', scenario.title);
     }
   }
   

@@ -109,6 +109,11 @@ const GameBoard = () => {
 
   const handleResetGame = () => {
     resetGame();
+    // Clear URL parameters when resetting
+    if (window.location.hash.includes('?')) {
+      const baseHash = window.location.hash.split('?')[0];
+      window.history.replaceState(null, '', window.location.pathname + baseHash);
+    }
   };
 
   const handleNextPair = () => {
@@ -118,15 +123,23 @@ const GameBoard = () => {
   const handleConfirmParticipants = (participants) => {
     setSelectedParticipants(participants);
     setShowParticipantSelector(false);
-    // Reset game with new participants
+    // Reset game with new participants and clear URL
     resetGame();
+    if (window.location.hash.includes('?')) {
+      const baseHash = window.location.hash.split('?')[0];
+      window.history.replaceState(null, '', window.location.pathname + baseHash);
+    }
   };
 
   const handleConfirmScenarios = (scenarios) => {
     setSelectedScenarios(scenarios);
     setShowScenarioSelector(false);
-    // Reset game with new scenarios
+    // Reset game with new scenarios and clear URL
     resetGame();
+    if (window.location.hash.includes('?')) {
+      const baseHash = window.location.hash.split('?')[0];
+      window.history.replaceState(null, '', window.location.pathname + baseHash);
+    }
   };
 
   const handleShareSession = async () => {
