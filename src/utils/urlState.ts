@@ -99,10 +99,11 @@ export const parseUrlState = (): UrlState => {
 
 /**
  * Generate shareable URL for current session
+ * Uses hash routing for GitHub Pages compatibility
  */
 export const generateShareableUrl = (mysteryCards: MysteryCard[], scenario: Scenario): string => {
-  const url = new URL(window.location.origin + window.location.pathname);
-  const params = url.searchParams;
+  const baseUrl = window.location.origin + window.location.pathname;
+  const params = new URLSearchParams();
   
   if (mysteryCards && mysteryCards.length === 2 && mysteryCards.every(card => card.isRevealed)) {
     params.set('card1_role', encodeURIComponent(mysteryCards[0].role));
@@ -116,7 +117,8 @@ export const generateShareableUrl = (mysteryCards: MysteryCard[], scenario: Scen
     }
   }
   
-  return url.toString();
+  // Use hash routing: base/#/game?params
+  return `${baseUrl}#/game?${params.toString()}`;
 };
 
 /**
