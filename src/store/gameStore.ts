@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { scenarios, participants, shuffleArray, type Scenario } from '../data/scenarios.ts';
-import { updateUrlWithState, parseUrlState, clearUrlState, type UrlState } from '../utils/urlState.ts';
+import { parseUrlState, clearUrlState, type UrlState } from '../utils/urlState.ts';
 
 /**
  * Game state management using Zustand
  * Handles participants, roles, scenarios, and game flow
  */
 
-// Type definitions
+// Type definitions (kept for backwards compatibility, but not actively used in mystery card mode)
 export interface Participant {
   id: number;
   name: string;
@@ -55,6 +55,8 @@ export interface GameStore {
   // State
   totalParticipants: number;
   participants: Participant[];
+  selectedParticipants: string[]; // List of available participant names for this session
+  selectedScenarios: Scenario[]; // List of available scenarios for this session
   availableScenarios: Scenario[];
   pairs: Pair[];
   gamePhase: GamePhase;
@@ -66,23 +68,20 @@ export interface GameStore {
   // Actions
   initializeGame: () => void;
   initializeFromUrl: (urlState: UrlState) => void;
+  setSelectedParticipants: (participants: string[]) => void;
+  setSelectedScenarios: (scenarios: Scenario[]) => void;
   revealMysteryCard: (cardId: number) => void;
   checkMysteryPair: () => void;
-  revealParticipant: (participantId: number) => void;
-  checkAndFormPairs: () => void;
   revealScenario: (pairId: string) => void;
   resetGame: () => void;
   startNextPair: () => void;
   canStartNextPair: () => boolean;
 
   // Getters
-  getParticipantById: (id: number) => Participant | undefined;
   getPairById: (id: string) => Pair | undefined;
-  getRevealedParticipants: () => Participant[];
-  getUnpairedParticipants: () => Participant[];
-  areAllParticipantsRevealed: () => boolean;
   getGameStats: () => GameStats;
   getUsedScenarios: () => Scenario[];
+  getAvailableParticipantNames: () => string[];
 }
 
 const TOTAL_PARTICIPANTS = participants.length;
@@ -97,6 +96,12 @@ const useGameStore = create<GameStore>((set, get) => ({
   // Game configuration
   totalParticipants: TOTAL_PARTICIPANTS,
   
+  // Selected participants for this session (defaults to all)
+  selectedParticipants: [...participants],
+  
+  // Selected scenarios for this session (defaults to all)
+  selectedScenarios: [...scenarios],
+  
   // Participants state - array of participant objects
   participants: participants.map((name, index) => ({
     id: index + 1,
@@ -107,8 +112,8 @@ const useGameStore = create<GameStore>((set, get) => ({
     scenarioId: null
   })),
   
-  // Available scenarios (shuffled at game start)
-  availableScenarios: shuffleArray(scenarios),
+  // Available scenarios (not shuffled)
+  availableScenarios: scenarios,
   
   // Pairs of participants (Manager + Employee)
   pairs: [],
@@ -172,7 +177,7 @@ const useGameStore = create<GameStore>((set, get) => ({
         { id: 1, isRevealed: false, participant: null, role: null },
         { id: 2, isRevealed: false, participant: null, role: null }
       ],
-      availableScenarios: shuffleArray(scenarios)
+      availableScenarios: scenarios
     }));
     
     // Clear any existing URL state
@@ -206,7 +211,7 @@ const useGameStore = create<GameStore>((set, get) => ({
           employeeName: employeeCard.participant!,
           scenarioId: scenario.id,
           scenario: scenario,
-          isScenarioRevealed: false
+          isScenarioRevealed: true // Auto-reveal when loading from URL
         };
         
         set(() => ({
@@ -224,10 +229,27 @@ const useGameStore = create<GameStore>((set, get) => ({
           revealedScenarios: new Set<string>(),
           usedScenarioIds: new Set([scenario.id]),
           usedParticipantNames: usedNames,
-          availableScenarios: shuffleArray(scenarios)
+          availableScenarios: scenarios
         }));
       }
     }
+  },
+
+  /**
+   * Set selected participants for the game session
+   */
+  setSelectedParticipants: (selectedParticipants: string[]) => {
+    set({ selectedParticipants });
+  },
+
+  /**
+   * Set selected scenarios for the game session
+   */
+  setSelectedScenarios: (selectedScenarios: Scenario[]) => {
+    set({ 
+      selectedScenarios,
+      availableScenarios: selectedScenarios 
+    });
   },
 
   /**
@@ -236,9 +258,22 @@ const useGameStore = create<GameStore>((set, get) => ({
    */
   revealMysteryCard: (cardId: number) => {
     const state = get();
-    const availableParticipants = participants.filter(name => 
+    // Use selected participants instead of all participants
+    let availableParticipants = state.selectedParticipants.filter(name => 
       !state.usedParticipantNames.has(name)
     );
+    
+    // If only 1 participant left, randomly select from already used participants for the 8th person
+    if (availableParticipants.length === 1) {
+      const usedParticipants = state.selectedParticipants.filter(name => 
+        state.usedParticipantNames.has(name)
+      );
+      // Add a random used participant to available list for the second card
+      if (usedParticipants.length > 0) {
+        const randomUsedParticipant = usedParticipants[Math.floor(Math.random() * usedParticipants.length)];
+        availableParticipants.push(randomUsedParticipant);
+      }
+    }
     
     if (availableParticipants.length === 0) {
       return; // No more participants available
@@ -248,6 +283,7 @@ const useGameStore = create<GameStore>((set, get) => ({
     const randomParticipant = availableParticipants[Math.floor(Math.random() * availableParticipants.length)];
     
     // Determine role strategically to ensure one Manager and one Employee
+    // First card (id: 1) is always Employee, second card (id: 2) is always Manager
     let assignedRole: Role;
     const otherCard = state.mysteryCards.find(card => card.id !== cardId);
     
@@ -255,9 +291,12 @@ const useGameStore = create<GameStore>((set, get) => ({
       // Other card is already revealed, assign opposite role
       assignedRole = otherCard.role === ROLES.MANAGER ? ROLES.EMPLOYEE : ROLES.MANAGER;
     } else {
-      // First card being revealed, randomly assign role
-      assignedRole = Math.random() < 0.5 ? ROLES.MANAGER : ROLES.EMPLOYEE;
+      // First card being revealed - always assign Employee to card 1, Manager to card 2
+      assignedRole = cardId === 1 ? ROLES.EMPLOYEE : ROLES.MANAGER;
     }
+    
+    // Only add to usedParticipantNames if this is a new participant (not a reuse)
+    const isNewParticipant = !state.usedParticipantNames.has(randomParticipant);
     
     set((state) => ({
       mysteryCards: state.mysteryCards.map(card =>
@@ -270,7 +309,9 @@ const useGameStore = create<GameStore>((set, get) => ({
             }
           : card
       ),
-      usedParticipantNames: new Set([...state.usedParticipantNames, randomParticipant])
+      usedParticipantNames: isNewParticipant 
+        ? new Set([...state.usedParticipantNames, randomParticipant])
+        : state.usedParticipantNames
     }));
     
     // Check if both cards are revealed to form a pair
@@ -318,110 +359,12 @@ const useGameStore = create<GameStore>((set, get) => ({
             revealedScenarios: new Set<string>()
             // Keep mystery cards revealed - they will be reset when user clicks "Next Pair"
           }));
-          
-          // Update URL with the new pair and scenario
-          // Convert to URL-compatible format
-          const urlCards = revealedCards.map(card => ({
-            id: card.id,
-            isRevealed: card.isRevealed,
-            participant: card.participant!,
-            role: card.role!
-          }));
-          updateUrlWithState(urlCards, availableScenario);
         }, 2000); // 2 second delay to show the successful pairing
-      } else {
-        // No more scenarios available
-        console.log('No more scenarios available');
       }
+      // If no more scenarios available, pair is formed but no scenario assigned
     }
   },
 
-  /**
-   * Reveal a participant's role (legacy function for backwards compatibility)
-   */
-  revealParticipant: (participantId: number) => {
-    set((state) => ({
-      participants: state.participants.map(participant =>
-        participant.id === participantId
-          ? { ...participant, isRevealed: true }
-          : participant
-      )
-    }));
-    
-    // Check if we can form any new pairs
-    get().checkAndFormPairs();
-  },
-
-  /**
-   * Check for revealed Manager-Employee pairs and form them
-   */
-  checkAndFormPairs: () => {
-    const state = get();
-    const revealedParticipants = state.participants.filter(p => p.isRevealed && !p.pairId);
-    const revealedManagers = revealedParticipants.filter(p => p.role === ROLES.MANAGER);
-    const revealedEmployees = revealedParticipants.filter(p => p.role === ROLES.EMPLOYEE);
-    
-    const newPairs: Pair[] = [];
-    
-    // Form pairs between available managers and employees
-    const pairsToForm = Math.min(revealedManagers.length, revealedEmployees.length);
-    
-    for (let i = 0; i < pairsToForm; i++) {
-      const manager = revealedManagers[i];
-      const employee = revealedEmployees[i];
-      
-      // Find an unused scenario (not in usedScenarioIds)
-      const availableScenario = state.availableScenarios.find(scenario => 
-        !state.usedScenarioIds.has(scenario.id)
-      );
-      
-      if (availableScenario) {
-        const pairId = `pair-${manager.id}-${employee.id}`;
-        
-        newPairs.push({
-          id: pairId,
-          managerId: manager.id,
-          employeeId: employee.id,
-          scenarioId: availableScenario.id,
-          scenario: availableScenario,
-          isScenarioRevealed: false
-        });
-      }
-    }
-    
-    if (newPairs.length > 0) {
-      set((state) => {
-        const updatedParticipants = state.participants.map(participant => {
-          const pair = newPairs.find(p => 
-            p.managerId === participant.id || p.employeeId === participant.id
-          );
-          
-          if (pair) {
-            return {
-              ...participant,
-              pairId: pair.id,
-              scenarioId: pair.scenarioId
-            };
-          }
-          
-          return participant;
-        });
-        
-        // Mark scenarios as used and hide all previous pairs
-        const newUsedScenarioIds = new Set([
-          ...state.usedScenarioIds,
-          ...newPairs.map(pair => pair.scenarioId)
-        ]);
-        
-        return {
-          participants: updatedParticipants,
-          pairs: newPairs, // Replace old pairs with new ones (hiding previous scenarios)
-          usedScenarioIds: newUsedScenarioIds,
-          revealedScenarios: new Set<string>() // Reset revealed scenarios for new pairs
-        };
-      });
-    }
-  },
 
   /**
    * Reveal a scenario for a pair
@@ -446,38 +389,10 @@ const useGameStore = create<GameStore>((set, get) => ({
   },
 
   /**
-   * Get participant by ID
-   */
-  getParticipantById: (id: number): Participant | undefined => {
-    return get().participants.find(p => p.id === id);
-  },
-
-  /**
    * Get pair by ID
    */
   getPairById: (id: string): Pair | undefined => {
     return get().pairs.find(p => p.id === id);
-  },
-
-  /**
-   * Get all revealed participants
-   */
-  getRevealedParticipants: (): Participant[] => {
-    return get().participants.filter(p => p.isRevealed);
-  },
-
-  /**
-   * Get unpaired revealed participants
-   */
-  getUnpairedParticipants: (): Participant[] => {
-    return get().participants.filter(p => p.isRevealed && !p.pairId);
-  },
-
-  /**
-   * Check if all participants are revealed
-   */
-  areAllParticipantsRevealed: (): boolean => {
-    return get().participants.every(p => p.isRevealed);
   },
 
   /**
@@ -490,20 +405,26 @@ const useGameStore = create<GameStore>((set, get) => ({
     const revealedScenariosCount = state.revealedScenarios.size;
     const usedScenariosCount = state.usedScenarioIds.size;
     const usedParticipantsCount = state.usedParticipantNames.size;
-    const availableParticipants = participants.filter(name => 
+    // Use selectedParticipants instead of all participants
+    const availableParticipants = state.selectedParticipants.filter(name => 
       !state.usedParticipantNames.has(name)
     ).length;
     
+    // Check if game is complete considering odd participant reuse
+    const canFormAnotherPair = availableParticipants >= 2 || 
+                                (availableParticipants === 1 && state.usedParticipantNames.size > 0);
+    const isComplete = !canFormAnotherPair || (state.selectedScenarios.length - usedScenariosCount) === 0;
+    
     return {
-      totalParticipants: state.totalParticipants,
+      totalParticipants: state.selectedParticipants.length,
       revealedParticipants: revealedCount,
       formedPairs: pairsCount,
       revealedScenarios: revealedScenariosCount,
       usedScenarios: usedScenariosCount,
       usedParticipants: usedParticipantsCount,
       availableParticipants: availableParticipants,
-      availableScenarios: scenarios.length - usedScenariosCount,
-      isComplete: availableParticipants < 2 || (scenarios.length - usedScenariosCount) === 0
+      availableScenarios: state.selectedScenarios.length - usedScenariosCount,
+      isComplete: isComplete
     };
   },
 
@@ -540,14 +461,31 @@ const useGameStore = create<GameStore>((set, get) => ({
    */
   canStartNextPair: (): boolean => {
     const state = get();
-    const availableParticipants = participants.filter(name => 
+    // Use selectedParticipants instead of all participants
+    const availableParticipants = state.selectedParticipants.filter(name => 
       !state.usedParticipantNames.has(name)
     );
     const availableScenarios = state.availableScenarios.filter(scenario => 
       !state.usedScenarioIds.has(scenario.id)
     );
     
-    return availableParticipants.length >= 2 && availableScenarios.length > 0;
+    // Allow next pair if:
+    // - At least 2 participants available, OR
+    // - 1 participant available AND at least 1 used participant (can reuse)
+    const canFormPair = availableParticipants.length >= 2 || 
+                        (availableParticipants.length === 1 && state.usedParticipantNames.size > 0);
+    
+    return canFormPair && availableScenarios.length > 0;
+  },
+
+  /**
+   * Get list of available participant names for tooltip
+   */
+  getAvailableParticipantNames: (): string[] => {
+    const state = get();
+    return state.selectedParticipants.filter(name => 
+      !state.usedParticipantNames.has(name)
+    );
   }
 }));
 

@@ -6,6 +6,7 @@
 export interface Scenario {
   id: number;
   title: string;
+  catchyName: string;
   description: string;
   objective: string;
   employeeRole: string;
@@ -13,115 +14,252 @@ export interface Scenario {
   managerBrief: string;
   employeeBrief: string;
   employeePhrases: string[];
+  coachingTips?: {
+    dos: string[];
+    donts: string[];
+    powerMove: string;
+  };
 }
 
 export const scenarios: Scenario[] = [
   {
     id: 1,
-    title: "Persona Discovery",
-    description: "A coaching session focused on identifying employee strengths, motivations, and growth areas through active dialogue.",
-    objective: "Identify employee strengths, motivations, and growth areas",
-    employeeRole: "Low engagement, unclear goals",
-    keySkills: "Active listening, open-ended questioning, empathy",
-    managerBrief: "Your role is to conduct a discovery conversation to understand this employee's strengths, what motivates them, and areas where they want to grow. Use active listening and open-ended questions to draw out their perspective. Avoid making assumptions and focus on understanding their current state of engagement and clarity around their goals.",
-    employeeBrief: "You're feeling disengaged at work and unclear about your career direction. You're not sure what your strengths are or how they align with your role. You're open to discussion but need guidance to articulate your thoughts and feelings about your current situation and future aspirations.",
+    title: "Career Growth Conversation",
+    catchyName: "Mapping the Future",
+    description:
+      "Aligning an employee’s career ambitions with realistic opportunities and team needs.",
+    objective: "Align career goals with team and organizational context",
+    employeeRole: "Seeking long-term growth guidance",
+    keySkills: "Big-picture thinking, trust-building, honest guidance",
+    managerBrief:
+      "Help the employee explore growth paths honestly. Provide perspective without promising outcomes you don’t control.",
+    employeeBrief:
+      "You’re ambitious and want to grow but feel uncertain about the path and whether the company can support your goals.",
     employeePhrases: [
-      "I don't know what I want to do here; I just do my tasks. (Low engagement, unclear goals)",
-      "I'm not sure I'm good at anything special. (Self-doubt)",
-      "Honestly, I don't see much growth opportunity here. (Lack of motivation)"
-    ]
+      "I want to grow, but I’m not sure how.",
+      "I’m worried about hitting a ceiling.",
+      "I don’t know if this role fits my long-term goals.",
+    ],
+    coachingTips: {
+      dos: [
+        "Explore **multiple paths**, not just promotions.",
+        "Be **honest** about constraints and realities.",
+        "Focus on **skills and experiences**, not titles.",
+        "Clarify what growth **is and isn’t** in your control.",
+        "You can reference [Career Growth Framework](/team-activity/CareerGrowth.png) for more information.",
+      ],
+      donts: [
+        "Overpromise outcomes.",
+        "Avoid difficult truths.",
+        "Make it only about business needs.",
+      ],
+      powerMove:
+        "Ask: **In two years, what would make you proud of this period?**",
+    },
   },
   {
     id: 2,
     title: "Adaptive Feedback",
-    description: "Delivering constructive feedback to a high performer who is sensitive to criticism and tends to be defensive.",
+    catchyName: "The Sensitive High Performer",
+    description:
+      "Delivering constructive feedback to a strong performer who reacts defensively to criticism.",
     objective: "Deliver feedback constructively based on personality",
-    employeeRole: "High performer but sensitive to criticism/Defensive",
-    keySkills: "Emotional intelligence, adaptability, framing feedback",
-    managerBrief: "You need to provide feedback to a top performer who has some areas for improvement, but they tend to react defensively to criticism. Focus on framing feedback positively, acknowledging their strengths first, and adapting your communication style to their sensitivity. Use emotional intelligence to read their reactions and adjust your approach accordingly.",
-    employeeBrief: "You're proud of your high performance and contributions to the team. When receiving feedback, you tend to feel defensive because you work hard and expect recognition. You may interpret constructive feedback as personal criticism. Try to show your natural defensive reactions while being open to the manager's approach.",
+    employeeRole: "High performer, sensitive to criticism",
+    keySkills: "Reading emotions, adjusting tone, clear feedback",
+    managerBrief:
+      "You need to deliver improvement feedback to a high performer who takes criticism personally. Protect motivation without avoiding the message. Adjust your tone, not your standards.",
+    employeeBrief:
+      "You’re proud of your performance and expect recognition. Feedback often feels personal, even when it’s meant to be constructive. You may react defensively at first.",
     employeePhrases: [
-      "I feel like you're always nitpicking.",
-      "I've already done my best; I don't think I can improve more. (Defensive)",
-      "Why are you focusing on that small mistake? (Defensive)"
-    ]
+      "It feels like you’re always focusing on small issues.",
+      "I’ve already put in a lot of effort here.",
+      "Why is this such a big deal?",
+    ],
+    coachingTips: {
+      dos: [
+        "Lead with **specific strengths**, not generic praise.",
+        "Ask **permission** before giving feedback to lower defenses.",
+        "Slow down when you sense **emotional pushback**.",
+        "Separate **intent from impact** clearly.",
+      ],
+      donts: [
+        "Stack multiple feedback points at once.",
+        "Argue with emotions or try to logic them away.",
+        "Drop the message just to keep things comfortable.",
+      ],
+      powerMove:
+        "Say clearly: **This is not about effort. It’s about impact.**",
+    },
   },
   {
     id: 3,
-    title: "Coaching for Improvement",
-    description: "A coaching conversation to help an employee who struggles with meeting deadlines discover their own solutions.",
-    objective: "Guide employee toward self-discovery of solutions",
-    employeeRole: "Struggling with deadlines",
-    keySkills: "Coaching techniques, problem-solving, patience",
-    managerBrief: "Rather than telling this employee what to do about their deadline issues, use coaching techniques to guide them toward discovering their own solutions. Ask powerful questions, be patient with their thought process, and help them identify the root causes and potential solutions themselves. Focus on building their problem-solving capabilities.",
-    employeeBrief: "You've been missing deadlines lately and feel overwhelmed. You're not sure why you're struggling - it could be time management, prioritization, workload, or other factors. You want to improve but need help figuring out what's going wrong and how to fix it. Be open to exploring the causes with your manager's guidance.",
+    title: "Clear Negative Feedback",
+    catchyName: "Time for Real Talk",
+    description:
+      "Delivering direct, clear feedback when previous soft approaches have not led to improvement.",
+    objective: "Deliver clear, firm, and constructive negative feedback",
+    employeeRole:
+      "Underperformance: missed deadlines, poor estimates, weak preparation",
+    keySkills: "Being direct, setting expectations, holding accountability",
+    managerBrief:
+      "Previous gentle feedback hasn’t worked. You need to be clear, factual, and direct while staying calm and constructive. Set expectations, explain consequences, and outline what needs to change.",
+    employeeBrief:
+      "You’ve been struggling with deadlines and preparation but didn’t realize how serious the situation had become. The directness of the feedback may feel uncomfortable or surprising.",
     employeePhrases: [
-      "I can't meet these deadlines; it's impossible. (Overwhelmed)",
-      "I don't know how to organize myself better. (Lack of skills)",
-      "I just feel overwhelmed; I'm not sure what to do first. (Prioritization issue)"
-    ]
+      "I had too many things going on.",
+      "Estimation is hard for everyone.",
+      "I didn’t think it was that big of a deal.",
+    ],
+    coachingTips: {
+      dos: [
+        "Use **specific examples** and observable facts.",
+        "State **expectations and consequences** plainly.",
+        "Pause to confirm understanding, not agreement.",
+        "Offer support **after** clarity is established.",
+      ],
+      donts: [
+        "Soften the message until it loses meaning.",
+        "Compare performance to others.",
+        "Delay the conversation to avoid discomfort.",
+      ],
+      powerMove:
+        "Say plainly: **This is serious, and I want you to succeed. That requires change.**",
+    },
   },
   {
     id: 4,
-    title: "Handling Resistance",
-    description: "Engaging with an employee who is resistant to a proposed development plan and finding ways to overcome their objections.",
-    objective: "Engage resistant employees positively",
-    employeeRole: "Resistant to a proposed development plan",
-    keySkills: "Empathy, persuasion, conflict resolution",
-    managerBrief: "This employee is pushing back against a development plan you've proposed. Your goal is to understand the root of their resistance, show empathy for their concerns, and work together to find a path forward that addresses both their needs and business requirements. Use persuasion and conflict resolution skills to turn resistance into collaboration.",
-    employeeBrief: "You're resistant to the development plan being proposed because you feel it doesn't align with your interests, adds to your workload, or you're skeptical about its value. Express your concerns and objections clearly, but be willing to engage in dialogue if the manager shows understanding of your perspective.",
+    title: "Coaching for Improvement",
+    catchyName: "The Deadline Dilemma",
+    description:
+      "A coaching conversation to help an employee struggling with deadlines identify root causes and solutions.",
+    objective: "Guide the employee toward self-discovery of solutions",
+    employeeRole: "Struggling with deadlines",
+    keySkills: "Coaching through questions, problem-solving, patience",
+    managerBrief:
+      "Resist the urge to fix the problem. Use questions to help the employee understand what’s actually causing missed deadlines and what they can change themselves.",
+    employeeBrief:
+      "You feel overwhelmed and behind. You want to improve but aren’t sure whether the issue is prioritization, workload, or time management.",
     employeePhrases: [
-      "I don't think this plan fits my style. (Resistance)",
-      "I've done training like this before; it didn't help. (Skepticism)",
-      "I just don't want to change my way of working. (Stubbornness)"
-    ]
+      "I can’t keep up with these deadlines.",
+      "I don’t know how to organize myself better.",
+      "Everything feels urgent.",
+    ],
+    coachingTips: {
+      dos: [
+        "Ask what’s **actually** getting in the way.",
+        "Separate **symptoms from root causes**.",
+        "Let **silence** do the work.",
+        "Narrow focus to **one change at a time**.",
+      ],
+      donts: [
+        "Jump straight to tools or advice.",
+        "Accept vague explanations.",
+        "Take ownership of the problem.",
+      ],
+      powerMove: "Ask: **Which part of this is in your control this week?**",
+    },
   },
   {
     id: 5,
-    title: "Career Growth Conversation",
-    description: "Aligning an employee's career aspirations with team and organizational objectives while providing meaningful guidance.",
-    objective: "Align employee career goals with team/organization objectives",
-    employeeRole: "Seeking long-term growth guidance",
-    keySkills: "Strategic thinking, vision-setting, trust-building",
-    managerBrief: "This employee is seeking guidance on their long-term career growth. Help them understand how their aspirations can align with team and organizational needs. Use strategic thinking to paint a vision of their potential path, build trust by showing genuine investment in their growth, and help them see the bigger picture of how their development benefits everyone.",
-    employeeBrief: "You're ambitious and want to grow in your career, but you're not sure about the path forward or how your goals align with what the company needs. You're looking for genuine guidance and want to feel that your manager is invested in your long-term success, not just immediate productivity.",
+    title: "Persona Discovery",
+    catchyName: "Finding Your Spark",
+    description:
+      "A discovery conversation focused on understanding what drives the employee, where they feel stuck, and what’s missing for them right now.",
+    objective: "Identify employee strengths, motivations, and growth areas",
+    employeeRole: "Low engagement, unclear goals",
+    keySkills: "Listening deeply, asking good questions, showing empathy",
+    managerBrief:
+      "Your role is to run a discovery conversation, not to fix or guide yet. Focus on listening, understanding what motivates this employee, and where they feel blocked or disengaged. Avoid assumptions. Your goal is clarity, not solutions.",
+    employeeBrief:
+      "You feel disengaged and unsure about your direction. You’re doing your work but don’t feel particularly motivated or connected to long-term growth. You’re open to talking but struggle to clearly articulate what’s missing.",
     employeePhrases: [
-      "I want to advance in Almosafer, but I'm not sure how. (Ambition)",
-      "I'm worried I'll hit a ceiling here. (Fear of stagnation)",
-      "I'm not even sure this role fits my long-term goals. (Uncertainty)"
-    ]
+      "I don’t really know what I want here. I just do my tasks.",
+      "I’m not sure I’m particularly good at anything.",
+      "Honestly, I don’t see much growth for me right now.",
+    ],
+    coachingTips: {
+      dos: [
+        "Ask **open questions** and **pause** — give space to think.",
+        "Reflect back what you hear using **their exact words**.",
+        "Normalize **uncertainty** and remove pressure to have answers.",
+        "Stay curious longer than feels comfortable.",
+      ],
+      donts: [
+        "Label or **diagnose** the employee.",
+        "Pitch career paths or solutions **too early**.",
+        "Turn this into a performance or goal-setting discussion.",
+      ],
+      powerMove:
+        "End by summarizing **one insight the employee expressed**, not one you invented.",
+    },
   },
   {
     id: 6,
     title: "Positive Feedback - Hidden Talent",
-    description: "Coaching a high-performing but shy employee to increase their visibility while respecting their personality style.",
-    objective: "Teaching managers to coach visibility while respecting personality",
-    employeeRole: "High Performer but Shy (Not Getting Recognition)",
-    keySkills: "Spotting hidden talent, Encouraging visibility without forcing personality change, Coaching for confidence and recognition, Advocacy and representation",
-    managerBrief: "You have a high-performing team member who consistently delivers excellent work but struggles with visibility due to their shy nature. Your goal is to help them gain recognition without forcing them to change their personality. Focus on coaching them toward confidence, finding ways to showcase their work, and advocating for them while respecting their natural communication style.",
-    employeeBrief: "You do excellent work and take pride in your contributions, but you're naturally introverted and don't self-promote. You often feel overlooked in meetings and worry that your good work goes unnoticed. You want recognition but feel uncomfortable with traditional networking and self-promotion approaches.",
+    catchyName: "The Hidden Gem",
+    description:
+      "Helping a high-performing but quiet employee gain visibility without forcing personality change.",
+    objective: "Coach visibility while respecting personality",
+    employeeRole: "High performer, low visibility",
+    keySkills: "Advocating, building confidence, showing impact",
+    managerBrief:
+      "Support visibility in ways that suit the employee’s style. Advocate for their work and make impact visible without forcing extroversion.",
+    employeeBrief:
+      "You do strong work but don’t self-promote. You want recognition but feel uncomfortable speaking up or presenting.",
     employeePhrases: [
-      "I don't really like talking about my work; I just prefer to stay quiet and do it. (Shyness, undervalued)",
-      "I don't think people even notice what I do. (Lack of visibility)",
-      "I don't feel comfortable presenting in meetings. (Fear of exposure)"
-    ]
+      "I prefer to just do my work quietly.",
+      "I don’t think people notice what I contribute.",
+      "Presenting makes me uncomfortable.",
+    ],
+    coachingTips: {
+      dos: [
+        "Advocate for their work **publicly and consistently**.",
+        "Offer **low-pressure** visibility options.",
+        "Translate their work into **clear business impact**.",
+        "Agree on visibility actions together.",
+      ],
+      donts: [
+        "Push them to behave like extroverts.",
+        "Equate silence with low ambition.",
+        "Wait for them to self-promote.",
+      ],
+      powerMove:
+        "Say: **I’ll help surface your work. Your job is to keep doing it well.**",
+    },
   },
   {
     id: 7,
-    title: "Clear Negative Feedback",
-    description: "Delivering direct, clear feedback to an underperforming employee when previous soft approaches haven't worked.",
-    objective: "Train managers to deliver clear, firm, and constructive negative feedback when soft feedback fails",
-    employeeRole: "Underperformance Scenario — Wrong Estimates, Missed Deadlines, Poor Prep",
-    keySkills: "Giving direct, unsugarcoated feedback, Setting clear expectations and accountability, Balancing support with consequences, Holding underperformers to team standards",
-    managerBrief: "Previous gentle feedback hasn't led to improvement. This employee continues to provide wrong estimates, miss deadlines, and come unprepared to meetings. You need to deliver clear, firm, direct feedback while still being constructive. Set clear expectations, establish accountability measures, and explain consequences while offering support for improvement.",
-    employeeBrief: "You've been struggling with your work quality - your estimates are often wrong, you've missed several deadlines, and you sometimes come to meetings unprepared. You may have heard some feedback before but didn't realize how serious the situation was. You might feel defensive, overwhelmed, or surprised by the directness of the feedback.",
+    title: "Handling Resistance",
+    catchyName: "Breaking Through the Wall",
+    description:
+      "Turning employee resistance into collaboration without lowering standards.",
+    objective: "Engage resistant employees constructively",
+    employeeRole: "Resistant to development plan",
+    keySkills: "Listening under tension, influencing, staying firm",
+    managerBrief:
+      "Focus on understanding what’s behind the resistance. Keep goals intact while adjusting the path together.",
+    employeeBrief:
+      "You’re skeptical of the development plan and feel it may not align with your interests or workload.",
     employeePhrases: [
-      "I know the deadline slipped, but I had too many things going on. (Excuses for delays)",
-      "The meeting prep wasn't that important; we could wing it. (Dismissing preparation)",
-      "Estimation is always hard; everyone gets it wrong. (Normalizing poor estimates)",
-      "I thought it wasn't such a big deal last time. (Ignoring previous feedback)"
-    ]
-  }
+      "This doesn’t really fit how I work.",
+      "I’ve tried things like this before.",
+      "I don’t want to change my approach.",
+    ],
+    coachingTips: {
+      dos: [
+        "Name **resistance** without judgment.",
+        "Explore what the employee is **protecting or worried about**.",
+        "Adjust the plan without **abandoning the goal**.",
+        "Reconfirm expectations explicitly.",
+      ],
+      donts: [
+        "Push harder when resistance appears.",
+        "Take pushback personally.",
+        "Win the argument at the cost of trust.",
+      ],
+      powerMove: "Ask: **What part of this feels misaligned for you?**",
+    },
+  },
 ];
 
 /**
@@ -129,14 +267,12 @@ export const scenarios: Scenario[] = [
  */
 export const participants: string[] = [
   "Amira Mohiey Eldeen",
-  "Haitham Qudaih",
+  "Bilal Ataallh",
   "Hazem Huzayen",
-  "Muhammad Ahmed",
-  "Muhammad Talal",
   "Sagar Sreejith",
   "Steni Koilraj",
-  "Suhaib Khater",
-  "Syed Shahzeb Hasan"
+  "Syed Shahzeb Hasan",
+  "Reham Habbas",
 ];
 
 /**

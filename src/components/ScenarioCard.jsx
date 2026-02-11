@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import useGameStore from '../store/gameStore.ts';
 
 /**
@@ -6,7 +6,6 @@ import useGameStore from '../store/gameStore.ts';
  * Shows before the detailed Manager and Employee cards are displayed
  */
 const ScenarioCard = ({ pair }) => {
-  const [isRevealed, setIsRevealed] = useState(false);
   const revealScenario = useGameStore(state => state.revealScenario);
 
   // Handle both legacy participant objects and new mystery card format
@@ -20,7 +19,6 @@ const ScenarioCard = ({ pair }) => {
   const handleCardClick = () => {
     if (pair.isScenarioRevealed) return;
     
-    setIsRevealed(true);
     revealScenario(pair.id);
   };
 
@@ -31,7 +29,8 @@ const ScenarioCard = ({ pair }) => {
     >
       <div className="text-white text-center">
         <div className="text-4xl mb-3">📋</div>
-        <div className="font-semibold text-xl mb-3">Coaching Scenario Ready</div>
+        <div className="font-bold text-2xl mb-2">{pair.scenario?.catchyName || 'Coaching Scenario'}</div>
+        <div className="font-medium text-lg mb-3 opacity-90">{pair.scenario?.title}</div>
         <div className="text-sm opacity-90 mb-4">
           <div className="flex items-center justify-center space-x-3 mb-2">
             <div className="bg-white/20 rounded-full px-3 py-1 text-sm font-medium">
