@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import IntroPage from './components/IntroPage.jsx';
 import GameBoard from './components/GameBoard.jsx';
@@ -7,13 +7,13 @@ import CheatSheet from './components/CheatSheet.jsx';
 import './App.css';
 
 /**
- * Main App component with React Router
+ * Main App component with React Router (Hash-based for GitHub Pages)
  * Entry point for the Role-Play Game application with separate routes
  */
 function App() {
   return (
     <ThemeProvider>
-      <Router basename="/team-activity">
+      <Router>
         <div className="App">
           <Routes>
             <Route path="/" element={<IntroPage />} />
